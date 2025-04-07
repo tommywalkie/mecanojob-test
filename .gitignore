@@ -1,0 +1,15 @@
+# Dependency directories
+node_modules/
+
+# dotenv environment variable files
+.env*
+!.env.example
+
+# Build outputs
+dist/
+build/
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
