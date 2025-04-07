@@ -5,6 +5,7 @@ import { AppModule } from "./app.module";
 import { existsSync, writeFileSync } from "fs";
 import { ConfigService } from "@nestjs/config";
 import { DEFAULT_DB_FILE } from "./app.module";
+
 async function bootstrap() {
   const configService = new ConfigService();
 
