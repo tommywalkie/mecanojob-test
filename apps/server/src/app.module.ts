@@ -5,6 +5,8 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
+import { AvailabilityModule } from "./availability/availability.module";
+import { AppointmentModule } from "./appointment/appointment.module";
 export const DEFAULT_DB_FILE = "my.db";
 
 @Module({
@@ -25,6 +27,8 @@ export const DEFAULT_DB_FILE = "my.db";
       }),
     }),
     UserModule,
+    AvailabilityModule,
+    AppointmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

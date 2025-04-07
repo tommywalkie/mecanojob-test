@@ -17,6 +17,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.70.0
         version: 5.72.0(react@19.1.0)
+      luxon:
+        specifier: ^3.6.1
+        version: 3.6.1
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -99,6 +102,9 @@ importers:
       class-validator:
         specifier: ^0.14.1
         version: 0.14.1
+      luxon:
+        specifier: ^3.6.1
+        version: 3.6.1
       typeorm:
         specifier: ^0.3.20
         version: 0.3.22(better-sqlite3@11.9.1)(reflect-metadata@0.2.2)
@@ -2122,6 +2128,10 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  luxon@3.6.1:
+    resolution: {integrity: sha512-tJLxrKJhO2ukZ5z0gyjY1zPh3Rh88Ej9P7jNrZiHMUXHae1yvI2imgOZtL1TO8TW6biMMKfTtAOoEJANgtWBMQ==}
+    engines: {node: '>=12'}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -5121,6 +5131,8 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  luxon@3.6.1: {}
 
   lz-string@1.5.0: {}
 
