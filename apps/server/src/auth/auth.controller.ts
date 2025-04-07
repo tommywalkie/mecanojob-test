@@ -30,10 +30,7 @@ export class AuthController {
   @ApiOperation({ summary: "Signup a user" })
   @ApiBody({ type: SignupDto })
   @ApiOkResponse({ type: User })
-  async signup(@Body() signupDto: SignupDto): Promise<User> {
-    const user = await this.authService.signup(signupDto);
-    console.log("Is instance?", user instanceof User);
-    console.log("Object type:", Object.prototype.toString.call(user));
-    return user;
+  signup(@Body() signupDto: SignupDto): Promise<User> {
+    return this.authService.signup(signupDto);
   }
 }
