@@ -13,7 +13,7 @@ import { User } from "src/user/user.entity";
 /**
  * Simple auth controller to handle login and signup
  */
-@Controller("auth")
+@Controller("api/auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

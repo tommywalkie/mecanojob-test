@@ -20,11 +20,16 @@ import {
   ApiBody,
   ApiOkResponse,
 } from "@nestjs/swagger";
+import { AvailabilityService } from "../availability/availability.service";
+import { Availability } from "../availability/availability.entity";
 
-@Controller("users")
+@Controller("api/users")
 @ApiBearerAuth()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly availabilityService: AvailabilityService
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard)
@@ -77,5 +82,11 @@ export class UserController {
   @ApiOperation({ summary: "Delete a user by id" })
   async remove(@Param("id") id: string): Promise<void> {
     await this.userService.deleteUser(id);
+  }
+
+  @Get(":id/availabilities")
+  @ApiOperation({ summary: "Get public availabilities for a user" })
+  async getAvailabilities(@Param("id") id: string): Promise<Availability[]> {
+    return this.availabilityService.findAll(id);
   }
 }

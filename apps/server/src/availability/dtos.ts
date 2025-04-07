@@ -7,40 +7,55 @@ import {
   Max,
   IsISO8601,
   IsNumber,
+  IsUUID,
+  IsEnum,
 } from "class-validator";
 import { Transform } from "class-transformer";
 
-export class CreateAvailabilityDto {
-  @ApiProperty({ description: "The day of the week (0-6, where 0 is Sunday)" })
-  @IsInt()
-  @Min(0)
-  @Max(6)
-  day: number;
+const DAYS_OF_WEEK = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+] as const;
+type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
 
-  @ApiProperty({ description: "Starting hour in 24h format (0-23)" })
-  @IsInt()
+export class TimeSlotDto {
+  @ApiProperty({ enum: DAYS_OF_WEEK })
+  @IsEnum(DAYS_OF_WEEK)
+  day: DayOfWeek;
+
+  @ApiProperty({ minimum: 0, maximum: 23 })
+  @IsNumber()
   @Min(0)
   @Max(23)
   startHour: number;
 
-  @ApiProperty({ description: "Starting minute (0-59)" })
-  @IsInt()
+  @ApiProperty({ minimum: 0, maximum: 59 })
+  @IsNumber()
   @Min(0)
   @Max(59)
   startMinute: number;
 
-  @ApiProperty({ description: "Duration in minutes" })
-  @IsInt()
-  @Min(1)
-  durationMinutes: number;
+  @ApiProperty({ minimum: 0, maximum: 23 })
+  @IsNumber()
+  @Min(0)
+  @Max(23)
+  endHour: number;
 
-  @ApiProperty({
-    description: "Optional instructions for the meeting",
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  instructions?: string;
+  @ApiProperty({ minimum: 0, maximum: 59 })
+  @IsNumber()
+  @Min(0)
+  @Max(59)
+  endMinute: number;
+}
+
+export class CreateAvailabilityDto {
+  @ApiProperty({ type: [TimeSlotDto] })
+  timeSlots: TimeSlotDto[];
 }
 
 export class UpdateAvailabilityDto extends CreateAvailabilityDto {}

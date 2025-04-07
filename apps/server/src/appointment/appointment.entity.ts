@@ -1,8 +1,7 @@
-import { ApiProperty } from "@nestjs/swagger";
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
+  Column,
   ManyToOne,
   JoinColumn,
 } from "typeorm";
@@ -15,47 +14,43 @@ export enum AppointmentStatus {
   COMPLETED = "completed",
 }
 
-@Entity({ name: "appointment" })
+@Entity("appointments")
 export class Appointment {
   @PrimaryGeneratedColumn("uuid")
-  @ApiProperty({ description: "Unique identifier of the appointment" })
   id: string;
 
-  @ManyToOne(() => User, { onDelete: "CASCADE" })
+  // Owner relationship
+  @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: "userId" })
-  @ApiProperty({ description: "User who owns this appointment slot" })
   user: User;
 
   @Column()
-  @ApiProperty({ description: "Email of the person booking the appointment" })
+  userId: string;
+
+  // Invitee information
+  @Column()
   inviteeEmail: string;
 
+  @Column({ nullable: true })
+  inviteeName: string;
+
   @Column()
-  @ApiProperty({ description: "Start date and time of the appointment" })
+  title: string;
+
+  @Column({ nullable: true })
+  description?: string;
+
+  @Column()
   startDate: Date;
 
   @Column()
-  @ApiProperty({ description: "End date and time of the appointment" })
   endDate: Date;
 
   @Column({
     type: "text",
     default: AppointmentStatus.PENDING,
   })
-  @ApiProperty({
-    description: "Status of the appointment",
-    enum: AppointmentStatus,
-    default: AppointmentStatus.PENDING,
-  })
   status: AppointmentStatus;
-
-  @Column({ nullable: true })
-  @ApiProperty({
-    description: "Notes added by the invitee",
-    required: false,
-    nullable: true,
-  })
-  notes: string;
 
   constructor(partial: Partial<Appointment>) {
     Object.assign(this, partial);

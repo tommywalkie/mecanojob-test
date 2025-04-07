@@ -1,18 +1,32 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 import { AppointmentService } from "./appointment.service";
 import { Appointment, AppointmentStatus } from "./appointment.entity";
 import { User } from "../user/user.entity";
-import { ConflictException, NotFoundException } from "@nestjs/common";
-import { CreateAppointmentDto, BookAppointmentDto } from "./dtos";
-import { describe, it, expect, beforeEach } from "vitest";
-import { createMockRepository, MockRepository } from "../utils";
+import { NotFoundException } from "@nestjs/common";
+import {
+  BookAppointmentDto,
+  CreateAppointmentDto,
+  UpdateAppointmentDto,
+} from "./dtos";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 
 describe("AppointmentService", () => {
   let service: AppointmentService;
-  let appointmentRepository: MockRepository<Appointment>;
+  let appointmentRepository: Repository<Appointment>;
 
-  const user = { id: "1", email: "test@example.com" } as User;
+  const mockUserId = "test-user-id";
+  const mockUser = new User({ id: mockUserId, email: "test@example.com" });
+
+  const mockAppointmentRepository = {
+    find: vi.fn(),
+    findOne: vi.fn(),
+    save: vi.fn(),
+    create: vi.fn(),
+    delete: vi.fn(),
+    remove: vi.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,13 +34,13 @@ describe("AppointmentService", () => {
         AppointmentService,
         {
           provide: getRepositoryToken(Appointment),
-          useFactory: createMockRepository,
+          useValue: mockAppointmentRepository,
         },
       ],
     }).compile();
 
     service = module.get<AppointmentService>(AppointmentService);
-    appointmentRepository = module.get<MockRepository<Appointment>>(
+    appointmentRepository = module.get<Repository<Appointment>>(
       getRepositoryToken(Appointment)
     );
   });
@@ -36,186 +50,243 @@ describe("AppointmentService", () => {
   });
 
   describe("create", () => {
-    it("should create an appointment if no conflict", async () => {
-      const dto: CreateAppointmentDto = {
+    it("should create a new appointment", async () => {
+      const createDto: CreateAppointmentDto = {
+        title: "Test Appointment",
         inviteeEmail: "invitee@example.com",
-        startDate: new Date("2023-01-02T10:00:00"), // Monday 10:00 AM
-        endDate: new Date("2023-01-02T10:30:00"), // Monday 10:30 AM
-        notes: "Test appointment",
+        startDate: new Date("2023-05-01T10:00:00Z"),
+        endDate: new Date("2023-05-01T11:00:00Z"),
       };
 
-      appointmentRepository.findOne.mockResolvedValue(null);
-      appointmentRepository.save.mockImplementation((entity) =>
-        Promise.resolve(entity)
-      );
-
-      const result = await service.create(user, dto);
-
-      expect(result).toEqual({
-        ...dto,
-        user,
-        status: AppointmentStatus.CONFIRMED,
+      const expectedAppointment = new Appointment({
+        ...createDto,
+        userId: mockUserId,
+        user: mockUser,
+        status: AppointmentStatus.PENDING,
       });
-      expect(appointmentRepository.findOne).toHaveBeenCalled();
-      expect(appointmentRepository.save).toHaveBeenCalled();
+
+      mockAppointmentRepository.save.mockResolvedValue(expectedAppointment);
+
+      const result = await service.create(mockUser, createDto);
+
+      expect(result).toEqual(expectedAppointment);
+      expect(mockAppointmentRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: createDto.title,
+          inviteeEmail: createDto.inviteeEmail,
+          startDate: createDto.startDate,
+          endDate: createDto.endDate,
+          userId: mockUserId,
+          user: mockUser,
+          status: AppointmentStatus.PENDING,
+        })
+      );
     });
 
-    it("should throw ConflictException if time slot is booked", async () => {
-      const dto: CreateAppointmentDto = {
+    it("should respect the status when provided", async () => {
+      const createDto: CreateAppointmentDto = {
+        title: "Test Appointment",
         inviteeEmail: "invitee@example.com",
-        startDate: new Date("2023-01-02T10:00:00"),
-        endDate: new Date("2023-01-02T10:30:00"),
-        notes: "Test appointment",
+        startDate: new Date("2023-05-01T10:00:00Z"),
+        endDate: new Date("2023-05-01T11:00:00Z"),
+        status: AppointmentStatus.CONFIRMED,
       };
 
-      appointmentRepository.findOne.mockResolvedValue({
-        id: "existing-appointment",
-      });
-
-      await expect(service.create(user, dto)).rejects.toThrow(
-        ConflictException
+      mockAppointmentRepository.save.mockImplementation(
+        (appointment) => appointment
       );
+
+      const result = await service.create(mockUser, createDto);
+
+      expect(result.status).toEqual(AppointmentStatus.CONFIRMED);
     });
   });
 
   describe("findAll", () => {
     it("should return all appointments for a user", async () => {
-      const appointments = [
-        {
-          id: "appt1",
-          inviteeEmail: "invitee1@example.com",
-          startDate: new Date("2023-01-02T10:00:00"),
-          endDate: new Date("2023-01-02T10:30:00"),
-          status: AppointmentStatus.CONFIRMED,
-        },
-        {
-          id: "appt2",
-          inviteeEmail: "invitee2@example.com",
-          startDate: new Date("2023-01-03T14:00:00"),
-          endDate: new Date("2023-01-03T14:30:00"),
+      const mockAppointments = [
+        new Appointment({
+          id: "appt-1",
+          userId: mockUserId,
+          title: "Meeting 1",
+          inviteeEmail: "test@example.com",
+          startDate: new Date("2023-05-01T10:00:00Z"),
+          endDate: new Date("2023-05-01T11:00:00Z"),
           status: AppointmentStatus.PENDING,
-        },
+        }),
+        new Appointment({
+          id: "appt-2",
+          userId: mockUserId,
+          title: "Meeting 2",
+          inviteeEmail: "other@example.com",
+          startDate: new Date("2023-05-02T14:00:00Z"),
+          endDate: new Date("2023-05-02T15:00:00Z"),
+          status: AppointmentStatus.CONFIRMED,
+        }),
       ];
 
-      appointmentRepository.find.mockResolvedValue(appointments);
+      mockAppointmentRepository.find.mockResolvedValue(mockAppointments);
 
-      const result = await service.findAll(user.id);
+      const result = await service.findAll(mockUserId);
 
-      expect(result).toEqual(appointments);
-      expect(appointmentRepository.find).toHaveBeenCalledWith({
-        where: { user: { id: user.id } },
+      expect(result).toEqual(mockAppointments);
+      expect(mockAppointmentRepository.find).toHaveBeenCalledWith({
+        where: { userId: mockUserId },
         order: { startDate: "ASC" },
       });
     });
   });
 
   describe("findOne", () => {
-    it("should return a single appointment", async () => {
-      const appointment = {
-        id: "appt1",
-        inviteeEmail: "invitee@example.com",
-        startDate: new Date("2023-01-02T10:00:00"),
-        endDate: new Date("2023-01-02T10:30:00"),
-        status: AppointmentStatus.CONFIRMED,
-      };
+    it("should return an appointment if found", async () => {
+      const mockAppointment = new Appointment({
+        id: "appt-1",
+        userId: mockUserId,
+        title: "Meeting 1",
+        inviteeEmail: "test@example.com",
+        startDate: new Date("2023-05-01T10:00:00Z"),
+        endDate: new Date("2023-05-01T11:00:00Z"),
+        status: AppointmentStatus.PENDING,
+      });
 
-      appointmentRepository.findOne.mockResolvedValue(appointment);
+      mockAppointmentRepository.findOne.mockResolvedValue(mockAppointment);
 
-      const result = await service.findOne(appointment.id, user.id);
+      const result = await service.findOne("appt-1", mockUserId);
 
-      expect(result).toEqual(appointment);
-      expect(appointmentRepository.findOne).toHaveBeenCalled();
+      expect(result).toEqual(mockAppointment);
+      expect(mockAppointmentRepository.findOne).toHaveBeenCalledWith({
+        where: { id: "appt-1", userId: mockUserId },
+      });
     });
 
     it("should throw NotFoundException if appointment not found", async () => {
-      appointmentRepository.findOne.mockResolvedValue(null);
+      mockAppointmentRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne("non-existent-id", user.id)).rejects.toThrow(
+      await expect(service.findOne("non-existent", mockUserId)).rejects.toThrow(
         NotFoundException
       );
     });
   });
 
   describe("update", () => {
-    it("should update an appointment status", async () => {
-      const appointment = {
-        id: "appt1",
-        inviteeEmail: "invitee@example.com",
-        startDate: new Date("2023-01-02T10:00:00"),
-        endDate: new Date("2023-01-02T10:30:00"),
+    it("should update an appointment", async () => {
+      const mockAppointment = new Appointment({
+        id: "appt-1",
+        userId: mockUserId,
+        title: "Original Title",
+        inviteeEmail: "test@example.com",
+        startDate: new Date("2023-05-01T10:00:00Z"),
+        endDate: new Date("2023-05-01T11:00:00Z"),
         status: AppointmentStatus.PENDING,
-      };
+      });
 
-      const updateDto = {
+      const updateDto: UpdateAppointmentDto = {
+        title: "Updated Title",
         status: AppointmentStatus.CONFIRMED,
-        notes: "Updated notes",
       };
 
-      appointmentRepository.findOne.mockResolvedValue(appointment);
-      appointmentRepository.save.mockImplementation((entity) =>
-        Promise.resolve(entity)
-      );
-
-      const result = await service.update(appointment.id, user.id, updateDto);
-
-      expect(result).toEqual({
-        ...appointment,
+      const updatedAppointment = {
+        ...mockAppointment,
         ...updateDto,
+      };
+
+      mockAppointmentRepository.findOne.mockResolvedValue(mockAppointment);
+      mockAppointmentRepository.save.mockResolvedValue(updatedAppointment);
+
+      const result = await service.update("appt-1", mockUserId, updateDto);
+
+      expect(result).toEqual(updatedAppointment);
+      expect(mockAppointmentRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: "appt-1",
+          title: "Updated Title",
+          status: AppointmentStatus.CONFIRMED,
+        })
+      );
+    });
+  });
+
+  describe("remove", () => {
+    it("should delete an appointment", async () => {
+      const mockAppointment = new Appointment({
+        id: "appt-1",
+        userId: mockUserId,
+      });
+
+      mockAppointmentRepository.findOne.mockResolvedValue(mockAppointment);
+
+      await service.remove("appt-1", mockUserId);
+
+      expect(mockAppointmentRepository.findOne).toHaveBeenCalledWith({
+        where: { id: "appt-1", userId: mockUserId },
+      });
+      expect(mockAppointmentRepository.remove).toHaveBeenCalledWith(
+        mockAppointment
+      );
+    });
+  });
+
+  describe("getUpcomingAppointments", () => {
+    it("should return future appointments for a user", async () => {
+      const now = new Date();
+      const mockAppointments = [
+        new Appointment({
+          id: "appt-1",
+          userId: mockUserId,
+          startDate: new Date(now.getTime() + 3600000), // 1 hour in the future
+          endDate: new Date(now.getTime() + 7200000), // 2 hours in the future
+        }),
+      ];
+
+      mockAppointmentRepository.find.mockResolvedValue(mockAppointments);
+
+      const result = await service.getUpcomingAppointments(mockUserId);
+
+      expect(result).toEqual(mockAppointments);
+      expect(mockAppointmentRepository.find).toHaveBeenCalledWith({
+        where: {
+          userId: mockUserId,
+          startDate: expect.any(Object), // MoreThan constraint
+        },
+        order: { startDate: "ASC" },
       });
     });
   });
 
   describe("bookAppointment", () => {
-    it("should book an appointment with PENDING status", async () => {
-      const dto: BookAppointmentDto = {
-        userId: user.id,
+    it("should book an appointment for an invitee", async () => {
+      const bookDto: BookAppointmentDto = {
+        userId: mockUserId,
+        title: "Booked Meeting",
         inviteeEmail: "invitee@example.com",
-        startDate: new Date("2023-01-02T10:00:00"),
-        notes: "Booking test",
+        inviteeName: "Invitee Name",
+        startDate: new Date("2023-05-01T10:00:00Z"),
+        endDate: new Date("2023-05-01T11:00:00Z"),
+        description: "Booking description",
       };
 
-      appointmentRepository.save.mockResolvedValue({
-        id: "new-appointment",
-        user: { id: dto.userId },
-        inviteeEmail: dto.inviteeEmail,
-        startDate: dto.startDate,
-        notes: dto.notes,
+      const expectedAppointment = new Appointment({
+        ...bookDto,
         status: AppointmentStatus.PENDING,
       });
 
-      const result = await service.bookAppointment(dto);
+      mockAppointmentRepository.save.mockResolvedValue(expectedAppointment);
 
-      expect(result).toHaveProperty("id", "new-appointment");
-      expect(result.inviteeEmail).toBe(dto.inviteeEmail);
-      expect(result.status).toBe(AppointmentStatus.PENDING);
-      expect(appointmentRepository.save).toHaveBeenCalled();
-    });
-  });
+      const result = await service.bookAppointment(bookDto);
 
-  describe("getUpcomingAppointments", () => {
-    it("should return upcoming appointments for a user", async () => {
-      const now = new Date();
-      const futureDate = new Date(now);
-      futureDate.setDate(futureDate.getDate() + 1);
-
-      const appointments = [
-        {
-          id: "appt1",
-          startDate: futureDate,
-          endDate: new Date(futureDate.getTime() + 30 * 60000),
-          status: AppointmentStatus.CONFIRMED,
-        },
-      ];
-
-      appointmentRepository.find.mockResolvedValue(appointments);
-
-      const result = await service.getUpcomingAppointments(user.id);
-
-      expect(result).toEqual(appointments);
-      expect(appointmentRepository.find).toHaveBeenCalled();
-      expect(
-        appointmentRepository.find.mock.calls[0][0].where.startDate
-      ).toBeDefined();
+      expect(result).toEqual(expectedAppointment);
+      expect(mockAppointmentRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: mockUserId,
+          title: bookDto.title,
+          inviteeEmail: bookDto.inviteeEmail,
+          inviteeName: bookDto.inviteeName,
+          startDate: bookDto.startDate,
+          endDate: bookDto.endDate,
+          description: bookDto.description,
+          status: AppointmentStatus.PENDING,
+        })
+      );
     });
   });
 });

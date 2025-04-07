@@ -1,10 +1,6 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { Appointment, AppointmentStatus } from "./appointment.entity";
 import { User } from "../user/user.entity";
 import {
@@ -12,7 +8,6 @@ import {
   CreateAppointmentDto,
   UpdateAppointmentDto,
 } from "./dtos";
-import { DateTime } from "luxon";
 
 @Injectable()
 export class AppointmentService {
@@ -25,29 +20,11 @@ export class AppointmentService {
     user: User,
     createAppointmentDto: CreateAppointmentDto
   ): Promise<Appointment> {
-    // Check for conflicts in the same time slot
-    const { startDate, endDate } = createAppointmentDto;
-
-    // Check for conflicts
-    const conflictingAppointment = await this.appointmentRepository.findOne({
-      where: [
-        {
-          user: { id: user.id },
-          startDate: LessThanOrEqual(endDate),
-          endDate: MoreThanOrEqual(startDate),
-          status: AppointmentStatus.CONFIRMED,
-        },
-      ],
-    });
-
-    if (conflictingAppointment) {
-      throw new ConflictException("Time slot is already booked");
-    }
-
     const appointment = new Appointment({
       ...createAppointmentDto,
       user,
-      status: AppointmentStatus.CONFIRMED,
+      userId: user.id,
+      status: createAppointmentDto.status || AppointmentStatus.PENDING,
     });
 
     return this.appointmentRepository.save(appointment);
@@ -55,20 +32,18 @@ export class AppointmentService {
 
   async findAll(userId: string): Promise<Appointment[]> {
     return this.appointmentRepository.find({
-      where: { user: { id: userId } },
+      where: { userId },
       order: { startDate: "ASC" },
     });
   }
 
   async findOne(id: string, userId: string): Promise<Appointment> {
     const appointment = await this.appointmentRepository.findOne({
-      where: { id, user: { id: userId } },
+      where: { id, userId },
     });
-
     if (!appointment) {
       throw new NotFoundException("Appointment not found");
     }
-
     return appointment;
   }
 
@@ -78,25 +53,22 @@ export class AppointmentService {
     updateAppointmentDto: UpdateAppointmentDto
   ): Promise<Appointment> {
     const appointment = await this.findOne(id, userId);
-
     Object.assign(appointment, updateAppointmentDto);
-
     return this.appointmentRepository.save(appointment);
   }
 
   async remove(id: string, userId: string): Promise<void> {
     const appointment = await this.findOne(id, userId);
-
     await this.appointmentRepository.remove(appointment);
   }
 
   async getUpcomingAppointments(userId: string): Promise<Appointment[]> {
-    const now = DateTime.local();
+    const now = new Date();
 
     return this.appointmentRepository.find({
       where: {
-        user: { id: userId },
-        startDate: MoreThanOrEqual(now.toJSDate()),
+        userId,
+        startDate: MoreThan(now),
       },
       order: { startDate: "ASC" },
     });
@@ -109,10 +81,38 @@ export class AppointmentService {
 
     const appointment = new Appointment({
       ...otherData,
+      userId,
       user: { id: userId } as User,
       status: AppointmentStatus.PENDING,
     });
 
     return this.appointmentRepository.save(appointment);
+  }
+
+  async updateAppointment(
+    id: string,
+    updateAppointmentDto: UpdateAppointmentDto
+  ): Promise<Appointment> {
+    const appointment = await this.appointmentRepository.findOneBy({ id });
+
+    if (!appointment) {
+      throw new NotFoundException(`Appointment with ID ${id} not found`);
+    }
+
+    // Update only the fields that are provided
+    Object.assign(appointment, updateAppointmentDto);
+
+    return this.appointmentRepository.save(appointment);
+  }
+
+  async findBookedAppointments(userId: string): Promise<Appointment[]> {
+    // Get all appointments for the user that are either pending or confirmed
+    return this.appointmentRepository.find({
+      where: [
+        { userId, status: AppointmentStatus.PENDING },
+        { userId, status: AppointmentStatus.CONFIRMED },
+      ],
+      order: { startDate: "ASC" },
+    });
   }
 }

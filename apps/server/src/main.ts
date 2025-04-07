@@ -29,13 +29,13 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle("MecanoJob Test")
-    .setDescription("API pour le test technique de MecanoJob")
+    .setDescription("API documentation for the MecanoJob test")
     .setVersion("1.0")
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document);
+  SwaggerModule.setup("docs", app, document);
 
   await app.listen(3000);
   console.log(`Application running on: ${await app.getUrl()}`);

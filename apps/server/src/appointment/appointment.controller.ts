@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   Request,
+  Patch,
 } from "@nestjs/common";
 import { AppointmentService } from "./appointment.service";
 import { Appointment } from "./appointment.entity";
@@ -25,9 +26,10 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiTags,
+  ApiParam,
 } from "@nestjs/swagger";
 
-@Controller("appointments")
+@Controller("api/appointments")
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags("appointments")
 export class AppointmentController {
@@ -109,5 +111,17 @@ export class AppointmentController {
     @Body() bookAppointmentDto: BookAppointmentDto
   ): Promise<Appointment> {
     return this.appointmentService.bookAppointment(bookAppointmentDto);
+  }
+
+  @Patch(":id")
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: "Update an appointment" })
+  @ApiParam({ name: "id", description: "Appointment ID" })
+  @ApiBody({ type: UpdateAppointmentDto })
+  async updateAppointment(
+    @Param("id") id: string,
+    @Body() updateAppointmentDto: UpdateAppointmentDto
+  ) {
+    return this.appointmentService.updateAppointment(id, updateAppointmentDto);
   }
 }
