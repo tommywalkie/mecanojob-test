@@ -18,11 +18,7 @@ export class UserService {
   async createUser(
     user: RequiredKeys<Partial<User>, "email" | "password">
   ): Promise<User> {
-    const existingUser = await this.getUserByEmail(user.email);
-    if (existingUser) {
-      throw new ConflictException("User with this email already exists");
-    }
-    return this.userRepository.save(user);
+    return this.userRepository.save(new User(user));
   }
 
   async findAll(): Promise<User[]> {

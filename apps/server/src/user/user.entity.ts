@@ -32,4 +32,8 @@ export class User {
     nullable: true,
   })
   phone: string;
+
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
 }

@@ -34,3 +34,9 @@ export class SignupDto {
   @ApiProperty({ description: "Phone number of the user", required: false })
   phone: string;
 }
+
+export class TokenDto {
+  @IsNotEmpty()
+  @ApiProperty({ description: "Token of the user" })
+  token: string;
+}

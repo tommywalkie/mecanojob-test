@@ -7,6 +7,9 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
+/**
+ * Simple JWT guard to authenticate requests
+ */
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
