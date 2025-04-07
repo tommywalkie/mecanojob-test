@@ -13,4 +13,9 @@ export default defineConfig({
       include: ["**/*.{ts,tsx}"],
     },
   },
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
 });

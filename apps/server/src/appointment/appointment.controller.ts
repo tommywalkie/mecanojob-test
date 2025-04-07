@@ -25,7 +25,6 @@ import {
   ApiBody,
   ApiOkResponse,
   ApiTags,
-  ApiResponse,
 } from "@nestjs/swagger";
 
 @Controller("appointments")
