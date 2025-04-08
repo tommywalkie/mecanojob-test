@@ -36,9 +36,8 @@ export const useSignup = () => {
 
       return response.json()
     },
-    onSuccess: (data) => {
-      setAuth(data.access_token || data.token, data.user || data)
-      navigate('/dashboard')
+    onSuccess: () => {
+      navigate('/login')
     },
   })
 }

@@ -2,6 +2,8 @@
 
 Appointment scheduling system, intended for a technical test for MecanoJob.
 
+The project is currently hosted on my personal website: https://mecanojob-test.tommywalkie.com.
+
 ## Project structure
 
 The project is a monorepo with a client and a server.
