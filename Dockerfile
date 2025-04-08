@@ -35,7 +35,7 @@ COPY package.json pnpm-lock.yaml* ./
 COPY apps/server/package.json ./apps/server/
 
 # Install only production dependencies
-RUN pnpm install --prod
+RUN pnpm install --filter @mecanojob/server --prod
 
 # Copy built application from builder stage
 COPY --from=builder /app/apps/server/dist ./apps/server/dist
