@@ -6,6 +6,8 @@ The project is currently hosted on my personal website: https://mecanojob-test.t
 
 A Swagger UI is available at `/docs`.
 
+![Preview](./assets/preview.png)
+
 ## Project structure
 
 The project is a PNPM-based monorepo with a client and a server.
