@@ -4,15 +4,40 @@ Appointment scheduling system, intended for a technical test for MecanoJob.
 
 The project is currently hosted on my personal website: https://mecanojob-test.tommywalkie.com.
 
+A Swagger UI is available at `/docs`.
+
 ## Project structure
 
-The project is a monorepo with a client and a server.
+The project is a PNPM-based monorepo with a client and a server.
 
-The client is a Vite project using React, TailwindCSS and TypeScript.
+### Tech choices
 
-The server is a NestJS project powered by TypeORM, SQLite and Swagger.
+#### Client
 
-The Swagger UI is available at `/docs`.
+- **Vite**: This is my main tool for building (headless) frontend applications.
+- **React**: This is my preferred frontend framework, and this is the one that the company I'm enrolling in is using.
+- **TailwindCSS**: I could have chosen any other CSS framework, or CSS-in-JS library, but I'm very comfortable with TailwindCSS.
+- **Zod**: This is my preferred schema declaration and validation library and for quick type inference.
+- **React Hook Form**: This is what I like to use for interactive and predictable forms.
+- **Tanstack Query**: This is my go-to library for data fetching, caching and state management.
+
+#### Server
+
+- **NestJS**: This is a popular Node.js framework for building scalable server-side applications.
+  - Following my previous experience with it, I know it well and it's a good fit for this project and the entities I had in mind.
+  - My intent is to let:
+    - the **controllers** handle the routing and Swagger documentation,
+    - the **services** handle the business logic,
+    - there could have been **repositories** to handle the database queries, but the TypeORM integration with NestJS already handles this.
+- **TypeORM**: I needed a simple database for the technical test and I know TypeORM is well integrated with NestJS, so I picked it with the `better-sqlite3` driver, even though I could have used a more robust database like PostgreSQL.
+- **Swagger**: While I'm implementing the project and considering adding (or not) some JSDoc to the codebase, I can simply use Swagger to document the API and test it.
+
+#### Tooling
+
+- **PNPM**: This is my preferred package manager, and it's capable of handling the monorepo structure I'm using.
+- **Dotenvx**: This is a cross-platform tool that allows me to manage environment variables in a single place, and it's compatible with PNPM.
+- **Concurrently**: This is a tool that allows me to run multiple commands concurrently with decent terminal output.
+- **Vitest**: When using Vite-based projects, I like to use Vitest for testing, as it's more performant than Jest, and can work with Node projects too when well configured.
 
 ## Prerequisites
 

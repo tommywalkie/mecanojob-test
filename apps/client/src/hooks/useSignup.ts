@@ -1,12 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
-import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
 /**
  * Signup hook - handles user registration
  */
 export const useSignup = () => {
-  const { login: setAuth } = useAuth()
   const navigate = useNavigate()
 
   return useMutation({
