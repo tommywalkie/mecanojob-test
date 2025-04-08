@@ -1,13 +1,13 @@
-import { useEffect } from "react";
-import { z } from "zod";
-import { useForm, useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/Button";
-import { useGetAvailability } from "@/hooks/useGetAvailability";
-import { useUpdateAvailability } from "@/hooks/useUpdateAvailability";
-import { DayOfWeek, AvailabilityResponse, TimeSlot } from "@/types";
-import { Link } from "react-router-dom";
-import { DAY_NAMES, formatTime } from "@/utils/date-utils";
+import { useEffect } from 'react'
+import { z } from 'zod'
+import { useForm, useFieldArray } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Button } from '@/components/Button'
+import { useGetAvailability } from '@/hooks/useGetAvailability'
+import { useUpdateAvailability } from '@/hooks/useUpdateAvailability'
+import { DayOfWeek, AvailabilityResponse, TimeSlot } from '@/types'
+import { Link } from 'react-router-dom'
+import { DAY_NAMES, formatTime } from '@/utils/date-utils'
 
 const timeSlotSchema = z
   .object({
@@ -28,26 +28,25 @@ const timeSlotSchema = z
   .refine(
     (data) => {
       // Check if end time is after start time
-      if (data.endHour < data.startHour) return false;
-      if (data.endHour === data.startHour && data.endMinute <= data.startMinute)
-        return false;
-      return true;
+      if (data.endHour < data.startHour) return false
+      if (data.endHour === data.startHour && data.endMinute <= data.startMinute) return false
+      return true
     },
     {
-      message: "End time must be after start time",
-      path: ["endHour"],
-    }
-  );
+      message: 'End time must be after start time',
+      path: ['endHour'],
+    },
+  )
 
 const formSchema = z.object({
   timeSlots: z.array(timeSlotSchema),
-});
+})
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema>
 
 function AvailabilityPage() {
-  const { data: existingAvailability, isLoading } = useGetAvailability();
-  const updateAvailabilityMutation = useUpdateAvailability();
+  const { data: existingAvailability, isLoading } = useGetAvailability()
+  const updateAvailabilityMutation = useUpdateAvailability()
 
   const {
     register,
@@ -60,12 +59,12 @@ function AvailabilityPage() {
     defaultValues: {
       timeSlots: [],
     },
-  });
+  })
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "timeSlots",
-  });
+    name: 'timeSlots',
+  })
 
   // Convert API response to form data
   useEffect(() => {
@@ -78,13 +77,13 @@ function AvailabilityPage() {
           endHour: item.endHour,
           endMinute: item.endMinute,
         })),
-      });
+      })
     }
-  }, [existingAvailability, reset]);
+  }, [existingAvailability, reset])
 
   const onSubmit = (data: FormValues) => {
-    updateAvailabilityMutation.mutate(data.timeSlots as TimeSlot[]);
-  };
+    updateAvailabilityMutation.mutate(data.timeSlots as TimeSlot[])
+  }
 
   const addTimeSlot = () => {
     append({
@@ -93,21 +92,21 @@ function AvailabilityPage() {
       startMinute: 0,
       endHour: 17,
       endMinute: 0,
-    });
-  };
+    })
+  }
 
   // Group availabilities by day for better display
   const availabilityByDay =
     existingAvailability?.reduce(
       (acc, slot) => {
         if (!acc[slot.day]) {
-          acc[slot.day] = [];
+          acc[slot.day] = []
         }
-        acc[slot.day].push(slot);
-        return acc;
+        acc[slot.day].push(slot)
+        return acc
       },
-      {} as Record<string, AvailabilityResponse[]>
-    ) || {};
+      {} as Record<string, AvailabilityResponse[]>,
+    ) || {}
 
   // Sort days of the week
   const daysOrder: DayOfWeek[] = [
@@ -118,30 +117,25 @@ function AvailabilityPage() {
     DayOfWeek.FRIDAY,
     DayOfWeek.SATURDAY,
     DayOfWeek.SUNDAY,
-  ];
+  ]
   const sortedDays = Object.keys(availabilityByDay).sort(
-    (a, b) =>
-      daysOrder.indexOf(a as DayOfWeek) - daysOrder.indexOf(b as DayOfWeek)
-  ) as DayOfWeek[];
+    (a, b) => daysOrder.indexOf(a as DayOfWeek) - daysOrder.indexOf(b as DayOfWeek),
+  ) as DayOfWeek[]
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Availability Dashboard
-          </h1>
-          <p className="text-gray-600">
-            Manage your availability and share your booking page with others.
-          </p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Availability Dashboard</h1>
+          <p className="text-gray-600">Manage your availability and share your booking page with others.</p>
         </div>
 
         <Link to="/dashboard">
@@ -151,9 +145,7 @@ function AvailabilityPage() {
         {/* Current Availability Overview */}
         <div className="bg-white shadow-sm rounded-lg p-6 mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Current Availability
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900">Current Availability</h2>
             <span className="px-3 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
               {existingAvailability?.length || 0} Time Slots
             </span>
@@ -162,25 +154,19 @@ function AvailabilityPage() {
           {existingAvailability?.length ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
               {sortedDays.map((day) => (
-                <div
-                  key={day}
-                  className="border border-gray-200 rounded-md p-4"
-                >
-                  <h3 className="font-medium text-gray-900 mb-2">
-                    {DAY_NAMES[day]}
-                  </h3>
+                <div key={day} className="border border-gray-200 rounded-md p-4">
+                  <h3 className="font-medium text-gray-900 mb-2">{DAY_NAMES[day]}</h3>
                   <ul className="space-y-1">
                     {availabilityByDay[day]
                       .sort((a, b) => {
                         if (a.startHour !== b.startHour) {
-                          return a.startHour - b.startHour;
+                          return a.startHour - b.startHour
                         }
-                        return a.startMinute - b.startMinute;
+                        return a.startMinute - b.startMinute
                       })
                       .map((slot, idx) => (
                         <li key={idx} className="text-sm text-gray-600">
-                          {formatTime(slot.startHour, slot.startMinute)} -{" "}
-                          {formatTime(slot.endHour, slot.endMinute)}
+                          {formatTime(slot.startHour, slot.startMinute)} - {formatTime(slot.endHour, slot.endMinute)}
                         </li>
                       ))}
                   </ul>
@@ -205,9 +191,7 @@ function AvailabilityPage() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
-                    You haven't set any availability yet. Add time slots below.
-                  </p>
+                  <p className="text-sm text-yellow-700">You haven't set any availability yet. Add time slots below.</p>
                 </div>
               </div>
             </div>
@@ -217,14 +201,8 @@ function AvailabilityPage() {
         {/* Edit Availability Form */}
         <div className="bg-white shadow-sm rounded-lg p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Edit Availability
-            </h2>
-            <Button
-              type="button"
-              onClick={addTimeSlot}
-              className="bg-indigo-600 text-white"
-            >
+            <h2 className="text-xl font-semibold text-gray-900">Edit Availability</h2>
+            <Button type="button" onClick={addTimeSlot} className="bg-indigo-600 text-white">
               Add Time Slot
             </Button>
           </div>
@@ -239,14 +217,8 @@ function AvailabilityPage() {
                 {fields.map((field, index) => (
                   <div key={field.id} className="bg-gray-50 p-4 rounded-md">
                     <div className="flex justify-between items-center mb-3">
-                      <h3 className="text-lg font-medium">
-                        Time Slot #{index + 1}
-                      </h3>
-                      <button
-                        type="button"
-                        onClick={() => remove(index)}
-                        className="text-red-600 hover:text-red-800"
-                      >
+                      <h3 className="text-lg font-medium">Time Slot #{index + 1}</h3>
+                      <button type="button" onClick={() => remove(index)} className="text-red-600 hover:text-red-800">
                         <svg
                           className="w-5 h-5"
                           fill="none"
@@ -266,9 +238,7 @@ function AvailabilityPage() {
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Day
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Day</label>
                         <select
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                           {...register(`timeSlots.${index}.day`)}
@@ -280,18 +250,14 @@ function AvailabilityPage() {
                           ))}
                         </select>
                         {errors.timeSlots?.[index]?.day && (
-                          <p className="mt-1 text-sm text-red-600">
-                            {errors.timeSlots[index]?.day?.message}
-                          </p>
+                          <p className="mt-1 text-sm text-red-600">{errors.timeSlots[index]?.day?.message}</p>
                         )}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Start Time
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">Start Time</label>
                         <div className="flex mt-1">
                           <div className="w-1/2 pr-1">
                             <select
@@ -302,7 +268,7 @@ function AvailabilityPage() {
                             >
                               {Array.from({ length: 24 }).map((_, hour) => (
                                 <option key={hour} value={hour}>
-                                  {hour.toString().padStart(2, "0")}
+                                  {hour.toString().padStart(2, '0')}
                                 </option>
                               ))}
                             </select>
@@ -316,24 +282,19 @@ function AvailabilityPage() {
                             >
                               {[0, 15, 30, 45].map((minute) => (
                                 <option key={minute} value={minute}>
-                                  {minute.toString().padStart(2, "0")}
+                                  {minute.toString().padStart(2, '0')}
                                 </option>
                               ))}
                             </select>
                           </div>
                         </div>
-                        {(errors.timeSlots?.[index]?.startHour ||
-                          errors.timeSlots?.[index]?.startMinute) && (
-                          <p className="mt-1 text-sm text-red-600">
-                            Invalid start time
-                          </p>
+                        {(errors.timeSlots?.[index]?.startHour || errors.timeSlots?.[index]?.startMinute) && (
+                          <p className="mt-1 text-sm text-red-600">Invalid start time</p>
                         )}
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          End Time
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700">End Time</label>
                         <div className="flex mt-1">
                           <div className="w-1/2 pr-1">
                             <select
@@ -344,7 +305,7 @@ function AvailabilityPage() {
                             >
                               {Array.from({ length: 24 }).map((_, hour) => (
                                 <option key={hour} value={hour}>
-                                  {hour.toString().padStart(2, "0")}
+                                  {hour.toString().padStart(2, '0')}
                                 </option>
                               ))}
                             </select>
@@ -358,17 +319,14 @@ function AvailabilityPage() {
                             >
                               {[0, 15, 30, 45].map((minute) => (
                                 <option key={minute} value={minute}>
-                                  {minute.toString().padStart(2, "0")}
+                                  {minute.toString().padStart(2, '0')}
                                 </option>
                               ))}
                             </select>
                           </div>
                         </div>
-                        {(errors.timeSlots?.[index]?.endHour ||
-                          errors.timeSlots?.[index]?.endMinute) && (
-                          <p className="mt-1 text-sm text-red-600">
-                            Invalid end time
-                          </p>
+                        {(errors.timeSlots?.[index]?.endHour || errors.timeSlots?.[index]?.endMinute) && (
+                          <p className="mt-1 text-sm text-red-600">Invalid end time</p>
                         )}
                       </div>
                     </div>
@@ -408,7 +366,7 @@ function AvailabilityPage() {
                     Saving...
                   </span>
                 ) : (
-                  "Save Availability"
+                  'Save Availability'
                 )}
               </Button>
             </div>
@@ -431,9 +389,7 @@ function AvailabilityPage() {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-green-800">
-                      Your availability has been saved successfully!
-                    </p>
+                    <p className="text-sm font-medium text-green-800">Your availability has been saved successfully!</p>
                   </div>
                 </div>
               </div>
@@ -442,7 +398,7 @@ function AvailabilityPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default AvailabilityPage;
+export default AvailabilityPage

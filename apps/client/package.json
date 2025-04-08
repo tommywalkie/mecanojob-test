@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "format": "prettier --write ."
   },
   "author": "Tom Bazarnik <tommywalkie@gmail.com>",
   "license": "GPL-3.0-only",

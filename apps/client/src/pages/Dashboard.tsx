@@ -1,63 +1,49 @@
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/Button";
-import { useGetAvailability } from "@/hooks/useGetAvailability";
-import { DayOfWeek } from "@/types";
-import { useGetAppointments } from "@/hooks/useGetAppointments";
-import {
-  DAY_NAMES,
-  formatTime,
-  groupAvailabilitiesByDay,
-  sortDays,
-} from "@/utils/date-utils";
+import { useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/Button'
+import { useGetAvailability } from '@/hooks/useGetAvailability'
+import { DayOfWeek } from '@/types'
+import { useGetAppointments } from '@/hooks/useGetAppointments'
+import { DAY_NAMES, formatTime, groupAvailabilitiesByDay, sortDays } from '@/utils/date-utils'
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const { data: availabilities, isLoading: isLoadingAvailability } =
-    useGetAvailability();
-  const { data: appointments, isLoading: isLoadingAppointments } =
-    useGetAppointments();
-  const [copied, setCopied] = useState(false);
+  const { user } = useAuth()
+  const { data: availabilities, isLoading: isLoadingAvailability } = useGetAvailability()
+  const { data: appointments, isLoading: isLoadingAppointments } = useGetAppointments()
+  const [copied, setCopied] = useState(false)
 
   // Group availabilities by day
-  const availabilityByDay = groupAvailabilitiesByDay(availabilities || []);
+  const availabilityByDay = groupAvailabilitiesByDay(availabilities || [])
 
   // Get sorted days
-  const sortedDays = sortDays(Object.keys(availabilityByDay));
+  const sortedDays = sortDays(Object.keys(availabilityByDay))
 
   // Get the public booking URL
   const getPublicUrl = () => {
-    if (!user || !user.id) return "";
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/availability/${user.id}`;
-  };
+    if (!user || !user.id) return ''
+    const baseUrl = window.location.origin
+    return `${baseUrl}/availability/${user.id}`
+  }
 
-  const publicUrl = getPublicUrl();
+  const publicUrl = getPublicUrl()
 
   const copyToClipboard = () => {
-    if (!publicUrl) return;
+    if (!publicUrl) return
 
     navigator.clipboard.writeText(publicUrl).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
-    });
-  };
+      setCopied(true)
+      setTimeout(() => setCopied(false), 3000)
+    })
+  }
 
   // Get pending appointments count
-  const pendingAppointments =
-    appointments?.filter((appointment) => appointment.status === "pending") ||
-    [];
+  const pendingAppointments = appointments?.filter((appointment) => appointment.status === 'pending') || []
 
-  const confirmedAppointments =
-    appointments?.filter((appointment) => appointment.status === "confirmed") ||
-    [];
+  const confirmedAppointments = appointments?.filter((appointment) => appointment.status === 'confirmed') || []
 
   const possibleAppointments =
-    appointments?.filter(
-      (appointment) =>
-        appointment.status === "pending" || appointment.status === "confirmed"
-    ) || [];
+    appointments?.filter((appointment) => appointment.status === 'pending' || appointment.status === 'confirmed') || []
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -66,50 +52,28 @@ const Dashboard = () => {
         <div className="flex-1">
           <div className="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
             <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
-              <h2 className="text-xl font-semibold text-white">
-                Welcome back, {user?.email}
-              </h2>
-              <p className="text-indigo-100 mt-1">
-                Manage your availabilities and appointments
-              </p>
+              <h2 className="text-xl font-semibold text-white">Welcome back, {user?.email}</h2>
+              <p className="text-indigo-100 mt-1">Manage your availabilities and appointments</p>
             </div>
 
             <div className="p-6">
               <div className="flex flex-wrap gap-4">
                 <div className="bg-indigo-50 rounded-lg p-4 flex-1 min-w-[150px]">
-                  <div className="text-indigo-500 text-sm font-medium mb-1">
-                    Availabilities
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {availabilities?.length || 0}
-                  </div>
-                  <div className="text-gray-500 text-xs mt-1">
-                    Total time slots
-                  </div>
+                  <div className="text-indigo-500 text-sm font-medium mb-1">Availabilities</div>
+                  <div className="text-2xl font-bold">{availabilities?.length || 0}</div>
+                  <div className="text-gray-500 text-xs mt-1">Total time slots</div>
                 </div>
 
                 <div className="bg-yellow-50 rounded-lg p-4 flex-1 min-w-[150px]">
-                  <div className="text-yellow-600 text-sm font-medium mb-1">
-                    Pending
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {pendingAppointments.length}
-                  </div>
-                  <div className="text-gray-500 text-xs mt-1">
-                    Appointments to review
-                  </div>
+                  <div className="text-yellow-600 text-sm font-medium mb-1">Pending</div>
+                  <div className="text-2xl font-bold">{pendingAppointments.length}</div>
+                  <div className="text-gray-500 text-xs mt-1">Appointments to review</div>
                 </div>
 
                 <div className="bg-emerald-50 rounded-lg p-4 flex-1 min-w-[150px]">
-                  <div className="text-emerald-600 text-sm font-medium mb-1">
-                    Upcoming
-                  </div>
-                  <div className="text-2xl font-bold">
-                    {confirmedAppointments?.length || 0}
-                  </div>
-                  <div className="text-gray-500 text-xs mt-1">
-                    Future appointments
-                  </div>
+                  <div className="text-emerald-600 text-sm font-medium mb-1">Upcoming</div>
+                  <div className="text-2xl font-bold">{confirmedAppointments?.length || 0}</div>
+                  <div className="text-gray-500 text-xs mt-1">Future appointments</div>
                 </div>
               </div>
             </div>
@@ -117,9 +81,7 @@ const Dashboard = () => {
 
           {/* Public URL Card */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">
-              Your Public Booking URL
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-3">Your Public Booking URL</h3>
             {publicUrl ? (
               <>
                 <div className="flex items-center mb-3">
@@ -128,13 +90,11 @@ const Dashboard = () => {
                   </div>
                   <button
                     className={`px-4 py-2 rounded-r-md text-sm font-medium ${
-                      copied
-                        ? "bg-green-600 text-white"
-                        : "bg-indigo-600 text-white hover:bg-indigo-700"
+                      copied ? 'bg-green-600 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700'
                     }`}
                     onClick={copyToClipboard}
                   >
-                    {copied ? "Copied!" : "Copy"}
+                    {copied ? 'Copied!' : 'Copy'}
                   </button>
                 </div>
                 <a
@@ -161,22 +121,16 @@ const Dashboard = () => {
                 </a>
               </>
             ) : (
-              <p className="text-sm text-gray-500">
-                Loading your public URL...
-              </p>
+              <p className="text-sm text-gray-500">Loading your public URL...</p>
             )}
           </div>
 
           {/* Availabilities Overview */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                Your Availabilities
-              </h3>
+              <h3 className="text-lg font-medium text-gray-900">Your Availabilities</h3>
               <Link to="/availability">
-                <Button className="bg-indigo-600 text-white text-sm">
-                  Manage Availability
-                </Button>
+                <Button className="bg-indigo-600 text-white text-sm">Manage Availability</Button>
               </Link>
             </div>
 
@@ -187,25 +141,19 @@ const Dashboard = () => {
             ) : availabilities && availabilities.length > 0 ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sortedDays.map((day) => (
-                  <div
-                    key={day}
-                    className="border border-gray-200 rounded-md p-4"
-                  >
-                    <h3 className="font-medium text-gray-900 mb-2">
-                      {DAY_NAMES[day as DayOfWeek]}
-                    </h3>
+                  <div key={day} className="border border-gray-200 rounded-md p-4">
+                    <h3 className="font-medium text-gray-900 mb-2">{DAY_NAMES[day as DayOfWeek]}</h3>
                     <ul className="space-y-1">
                       {availabilityByDay[day]
                         .sort((a, b) => {
                           if (a.startHour !== b.startHour) {
-                            return a.startHour - b.startHour;
+                            return a.startHour - b.startHour
                           }
-                          return a.startMinute - b.startMinute;
+                          return a.startMinute - b.startMinute
                         })
                         .map((slot, idx) => (
                           <li key={idx} className="text-sm text-gray-600">
-                            {formatTime(slot.startHour, slot.startMinute)} -{" "}
-                            {formatTime(slot.endHour, slot.endMinute)}
+                            {formatTime(slot.startHour, slot.startMinute)} - {formatTime(slot.endHour, slot.endMinute)}
                           </li>
                         ))}
                     </ul>
@@ -228,17 +176,12 @@ const Dashboard = () => {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <p className="text-gray-500 mt-1">
-                  No availabilities set up yet.
-                </p>
+                <p className="text-gray-500 mt-1">No availabilities set up yet.</p>
                 <p className="text-sm text-gray-400 mt-1">
-                  Add available time slots to let people book appointments with
-                  you.
+                  Add available time slots to let people book appointments with you.
                 </p>
                 <Link to="/availability" className="mt-4 inline-block">
-                  <Button className="bg-indigo-600 text-white">
-                    Add Availability
-                  </Button>
+                  <Button className="bg-indigo-600 text-white">Add Availability</Button>
                 </Link>
               </div>
             )}
@@ -248,9 +191,7 @@ const Dashboard = () => {
         {/* Right Column */}
         <div className="lg:w-96">
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Upcoming Appointments
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Upcoming Appointments</h3>
 
             {isLoadingAppointments ? (
               <div className="flex justify-center py-8">
@@ -259,40 +200,32 @@ const Dashboard = () => {
             ) : possibleAppointments && possibleAppointments.length > 0 ? (
               <div className="space-y-3">
                 {possibleAppointments.slice(0, 5).map((appointment) => (
-                  <div
-                    key={appointment.id}
-                    className="border border-gray-200 rounded-md p-3 hover:bg-gray-50"
-                  >
+                  <div key={appointment.id} className="border border-gray-200 rounded-md p-3 hover:bg-gray-50">
                     <div className="flex justify-between items-start">
-                      <h4 className="font-medium text-gray-900">
-                        {appointment.title}
-                      </h4>
+                      <h4 className="font-medium text-gray-900">{appointment.title}</h4>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
-                          appointment.status === "confirmed"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                          appointment.status === 'confirmed'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
                         }`}
                       >
-                        {appointment.status.charAt(0).toUpperCase() +
-                          appointment.status.slice(1)}
+                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
                       </span>
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
-                      {new Date(appointment.startDate).toLocaleDateString()} •{" "}
+                      {new Date(appointment.startDate).toLocaleDateString()} •{' '}
                       {new Date(appointment.startDate).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}{" "}
-                      -{" "}
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}{' '}
+                      -{' '}
                       {new Date(appointment.endDate).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
+                        hour: '2-digit',
+                        minute: '2-digit',
                       })}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {appointment.inviteeName || appointment.inviteeEmail}
-                    </p>
+                    <p className="text-sm text-gray-500 mt-1">{appointment.inviteeName || appointment.inviteeEmail}</p>
                   </div>
                 ))}
 
@@ -320,17 +253,13 @@ const Dashboard = () => {
                   />
                 </svg>
                 <p className="text-gray-500 mt-1">No upcoming appointments</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  When people book time with you, it will appear here.
-                </p>
+                <p className="text-sm text-gray-400 mt-1">When people book time with you, it will appear here.</p>
               </div>
             )}
           </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Quick Actions
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
               <Link to="/availability" className="block">
                 <Button className="w-full">Manage Availability</Button>
@@ -340,8 +269,8 @@ const Dashboard = () => {
               </Link>
               <Button
                 onClick={() => {
-                  localStorage.removeItem("token");
-                  window.location.href = "/login";
+                  localStorage.removeItem('token')
+                  window.location.href = '/login'
                 }}
                 className="w-full"
               >
@@ -352,7 +281,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

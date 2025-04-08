@@ -1,15 +1,15 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation } from '@tanstack/react-query'
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/appointments/book`;
+const API_URL = `${import.meta.env.VITE_API_URL}/api/appointments/book`
 
 export interface BookAppointmentData {
-  userId: string;
-  title: string;
-  inviteeEmail: string;
-  inviteeName?: string;
-  startDate: Date;
-  endDate: Date;
-  description?: string;
+  userId: string
+  title: string
+  inviteeEmail: string
+  inviteeName?: string
+  startDate: Date
+  endDate: Date
+  description?: string
 }
 
 /**
@@ -17,20 +17,20 @@ export interface BookAppointmentData {
  */
 const bookAppointment = async (data: BookAppointmentData): Promise<any> => {
   const response = await fetch(API_URL, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
-  });
+  })
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "Failed to book appointment");
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.message || 'Failed to book appointment')
   }
 
-  return response.json();
-};
+  return response.json()
+}
 
 /**
  * Hook to book an appointment with a user
@@ -38,5 +38,5 @@ const bookAppointment = async (data: BookAppointmentData): Promise<any> => {
 export const useBookAppointment = () => {
   return useMutation({
     mutationFn: bookAppointment,
-  });
-};
+  })
+}

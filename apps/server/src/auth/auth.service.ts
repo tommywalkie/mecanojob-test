@@ -1,45 +1,38 @@
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { UserService } from "src/user/user.service";
-import { LoginDto, SignupDto } from "./dtos";
-import * as bcrypt from "bcrypt";
-import { User } from "src/user/user.entity";
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { UserService } from 'src/user/user.service'
+import { LoginDto, SignupDto } from './dtos'
+import * as bcrypt from 'bcrypt'
+import { User } from 'src/user/user.entity'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   async login(loginDto: LoginDto) {
-    const user = await this.userService.getUserByEmail(loginDto.email);
+    const user = await this.userService.getUserByEmail(loginDto.email)
     if (!user) {
-      throw new UnauthorizedException("Invalid credentials");
+      throw new UnauthorizedException('Invalid credentials')
     }
-    const isPasswordValid = await bcrypt.compare(
-      loginDto.password,
-      user.password
-    );
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password)
     if (!isPasswordValid) {
-      throw new UnauthorizedException("Invalid credentials");
+      throw new UnauthorizedException('Invalid credentials')
     }
     return {
       token: this.jwtService.sign({ id: user.id }),
-    };
+    }
   }
 
   async signup(signupDto: SignupDto): Promise<User> {
-    const existingUser = await this.userService.getUserByEmail(signupDto.email);
+    const existingUser = await this.userService.getUserByEmail(signupDto.email)
     if (existingUser) {
-      throw new ConflictException("User with this email already exists");
+      throw new ConflictException('User with this email already exists')
     }
-    const hashedPassword = await bcrypt.hash(signupDto.password, 10);
-    const newUser = { ...signupDto, password: hashedPassword };
-    return this.userService.createUser(newUser);
+    const hashedPassword = await bcrypt.hash(signupDto.password, 10)
+    const newUser = { ...signupDto, password: hashedPassword }
+    return this.userService.createUser(newUser)
   }
 }

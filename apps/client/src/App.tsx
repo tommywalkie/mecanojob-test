@@ -1,34 +1,29 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
-import AuthProvider, { useAuth } from "./context/AuthContext";
-import AvailabilityPage from "./pages/AvailabilityPage";
-import PublicAvailability from "./pages/PublicAvailability";
-import BookingForm from "./pages/BookingForm";
-import BookingConfirmation from "./pages/BookingConfirmation";
-import { AppointmentsPage } from "./pages/AppointmentsPage";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import Dashboard from './pages/Dashboard'
+import AuthProvider, { useAuth } from './context/AuthContext'
+import AvailabilityPage from './pages/AvailabilityPage'
+import PublicAvailability from './pages/PublicAvailability'
+import BookingForm from './pages/BookingForm'
+import BookingConfirmation from './pages/BookingConfirmation'
+import { AppointmentsPage } from './pages/AppointmentsPage'
 
 // Check if token exists directly - bypass the auth state which might not be initialized yet
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // First directly check localStorage for a token
-  const hasStoredToken = localStorage.getItem("token") !== null;
+  const hasStoredToken = localStorage.getItem('token') !== null
 
   // Fall back to the context state only if no token in localStorage
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth()
 
   // If either condition is met, user is considered authenticated
   if (!hasStoredToken && !isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" />
   }
 
-  return <>{children}</>;
-};
+  return <>{children}</>
+}
 
 function App() {
   return (
@@ -53,15 +48,9 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/availability/:userId"
-            element={<PublicAvailability />}
-          />
+          <Route path="/availability/:userId" element={<PublicAvailability />} />
           <Route path="/book/:userId" element={<BookingForm />} />
-          <Route
-            path="/booking-confirmation/:userId"
-            element={<BookingConfirmation />}
-          />
+          <Route path="/booking-confirmation/:userId" element={<BookingConfirmation />} />
 
           <Route
             path="/appointments"
@@ -76,7 +65,7 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
-  );
+  )
 }
 
-export default App;
+export default App

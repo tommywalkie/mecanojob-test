@@ -1,40 +1,34 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from "typeorm";
-import { User } from "../user/user.entity";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm'
+import { User } from '../user/user.entity'
 
-@Entity("availabilities")
+@Entity('availabilities')
 export class Availability {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @ManyToOne(() => User, { eager: true })
-  @JoinColumn({ name: "userId" })
-  user: User;
+  @JoinColumn({ name: 'userId' })
+  user: User
 
   @Column()
-  userId: string;
+  userId: string
 
   @Column()
-  day: string; // 'monday', 'tuesday', etc.
+  day: string // 'monday', 'tuesday', etc.
 
   @Column()
-  startHour: number;
+  startHour: number
 
   @Column()
-  startMinute: number;
+  startMinute: number
 
   @Column()
-  endHour: number;
+  endHour: number
 
   @Column()
-  endMinute: number;
+  endMinute: number
 
   constructor(partial: Partial<Availability>) {
-    Object.assign(this, partial);
+    Object.assign(this, partial)
   }
 }

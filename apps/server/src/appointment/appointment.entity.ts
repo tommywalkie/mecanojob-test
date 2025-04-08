@@ -1,58 +1,52 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from "typeorm";
-import { User } from "../user/user.entity";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm'
+import { User } from '../user/user.entity'
 
 export enum AppointmentStatus {
-  PENDING = "pending",
-  CONFIRMED = "confirmed",
-  CANCELED = "canceled",
-  COMPLETED = "completed",
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  CANCELED = 'canceled',
+  COMPLETED = 'completed',
 }
 
-@Entity("appointments")
+@Entity('appointments')
 export class Appointment {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   // Owner relationship
   @ManyToOne(() => User, { eager: true })
-  @JoinColumn({ name: "userId" })
-  user: User;
+  @JoinColumn({ name: 'userId' })
+  user: User
 
   @Column()
-  userId: string;
+  userId: string
 
   // Invitee information
   @Column()
-  inviteeEmail: string;
+  inviteeEmail: string
 
   @Column({ nullable: true })
-  inviteeName: string;
+  inviteeName: string
 
   @Column()
-  title: string;
+  title: string
 
   @Column({ nullable: true })
-  description?: string;
+  description?: string
 
   @Column()
-  startDate: Date;
+  startDate: Date
 
   @Column()
-  endDate: Date;
+  endDate: Date
 
   @Column({
-    type: "text",
+    type: 'text',
     default: AppointmentStatus.PENDING,
   })
-  status: AppointmentStatus;
+  status: AppointmentStatus
 
   constructor(partial: Partial<Appointment>) {
-    Object.assign(this, partial);
+    Object.assign(this, partial)
   }
 }

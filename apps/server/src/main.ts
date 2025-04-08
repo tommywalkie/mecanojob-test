@@ -1,44 +1,42 @@
-import { NestFactory } from "@nestjs/core";
-import { ValidationPipe } from "@nestjs/common";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { AppModule } from "./app.module";
-import { existsSync, writeFileSync } from "fs";
-import { ConfigService } from "@nestjs/config";
-import { DEFAULT_DB_FILE } from "./app.module";
+import { NestFactory } from '@nestjs/core'
+import { ValidationPipe } from '@nestjs/common'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { AppModule } from './app.module'
+import { existsSync, writeFileSync } from 'fs'
+import { ConfigService } from '@nestjs/config'
+import { DEFAULT_DB_FILE } from './app.module'
 
 async function bootstrap() {
-  const configService = new ConfigService();
+  const configService = new ConfigService()
 
   // Check if database file exists, create it if it doesn't
-  let dbFile = configService.get("DB_FILE");
+  let dbFile = configService.get('DB_FILE')
   if (!dbFile) {
-    console.log(
-      `process.env.DB_FILE is not set, defaulting to '${DEFAULT_DB_FILE}'`
-    );
-    dbFile = DEFAULT_DB_FILE;
+    console.log(`process.env.DB_FILE is not set, defaulting to '${DEFAULT_DB_FILE}'`)
+    dbFile = DEFAULT_DB_FILE
   }
   if (!existsSync(dbFile)) {
-    console.log("Database file does not exist, creating it...");
-    writeFileSync(dbFile, "");
+    console.log('Database file does not exist, creating it...')
+    writeFileSync(dbFile, '')
   }
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule)
 
-  app.enableCors();
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.enableCors()
+  app.useGlobalPipes(new ValidationPipe({ transform: true }))
 
   const config = new DocumentBuilder()
-    .setTitle("MecanoJob Test")
-    .setDescription("API documentation for the MecanoJob test")
-    .setVersion("1.0")
+    .setTitle('MecanoJob Test')
+    .setDescription('API documentation for the MecanoJob test')
+    .setVersion('1.0')
     .addBearerAuth()
-    .build();
+    .build()
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("docs", app, document);
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup('docs', app, document)
 
-  await app.listen(3000);
-  console.log(`Application running on: ${await app.getUrl()}`);
+  await app.listen(3000)
+  console.log(`Application running on: ${await app.getUrl()}`)
 }
 
-bootstrap();
+bootstrap()

@@ -11,27 +11,16 @@ import {
   ClassSerializerInterceptor,
   Request,
   Patch,
-} from "@nestjs/common";
-import { AppointmentService } from "./appointment.service";
-import { Appointment } from "./appointment.entity";
-import { AuthGuard } from "../auth/auth.guard";
-import {
-  CreateAppointmentDto,
-  UpdateAppointmentDto,
-  BookAppointmentDto,
-} from "./dtos";
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiBody,
-  ApiOkResponse,
-  ApiTags,
-  ApiParam,
-} from "@nestjs/swagger";
+} from '@nestjs/common'
+import { AppointmentService } from './appointment.service'
+import { Appointment } from './appointment.entity'
+import { AuthGuard } from '../auth/auth.guard'
+import { CreateAppointmentDto, UpdateAppointmentDto, BookAppointmentDto } from './dtos'
+import { ApiBearerAuth, ApiOperation, ApiBody, ApiOkResponse, ApiTags, ApiParam } from '@nestjs/swagger'
 
-@Controller("api/appointments")
+@Controller('api/appointments')
 @UseInterceptors(ClassSerializerInterceptor)
-@ApiTags("appointments")
+@ApiTags('appointments')
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
@@ -39,89 +28,77 @@ export class AppointmentController {
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: "Create a new appointment (for authenticated users)",
+    summary: 'Create a new appointment (for authenticated users)',
   })
   @ApiBody({ type: CreateAppointmentDto })
   @ApiOkResponse({ type: Appointment })
-  async create(
-    @Body() createAppointmentDto: CreateAppointmentDto,
-    @Request() req
-  ): Promise<Appointment> {
-    return this.appointmentService.create(req.user, createAppointmentDto);
+  async create(@Body() createAppointmentDto: CreateAppointmentDto, @Request() req): Promise<Appointment> {
+    return this.appointmentService.create(req.user, createAppointmentDto)
   }
 
   @Get()
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get all appointments for the current user" })
+  @ApiOperation({ summary: 'Get all appointments for the current user' })
   @ApiOkResponse({ type: [Appointment] })
   async findAll(@Request() req): Promise<Appointment[]> {
-    return this.appointmentService.findAll(req.user.id);
+    return this.appointmentService.findAll(req.user.id)
   }
 
-  @Get("upcoming")
+  @Get('upcoming')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get upcoming appointments for the current user" })
+  @ApiOperation({ summary: 'Get upcoming appointments for the current user' })
   @ApiOkResponse({ type: [Appointment] })
   async getUpcoming(@Request() req): Promise<Appointment[]> {
-    return this.appointmentService.getUpcomingAppointments(req.user.id);
+    return this.appointmentService.getUpcomingAppointments(req.user.id)
   }
 
-  @Get(":id")
+  @Get(':id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get a specific appointment by ID" })
+  @ApiOperation({ summary: 'Get a specific appointment by ID' })
   @ApiOkResponse({ type: Appointment })
-  async findOne(@Param("id") id: string, @Request() req): Promise<Appointment> {
-    return this.appointmentService.findOne(id, req.user.id);
+  async findOne(@Param('id') id: string, @Request() req): Promise<Appointment> {
+    return this.appointmentService.findOne(id, req.user.id)
   }
 
-  @Put(":id")
+  @Put(':id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Update an appointment" })
+  @ApiOperation({ summary: 'Update an appointment' })
   @ApiBody({ type: UpdateAppointmentDto })
   @ApiOkResponse({ type: Appointment })
   async update(
-    @Param("id") id: string,
+    @Param('id') id: string,
     @Body() updateAppointmentDto: UpdateAppointmentDto,
-    @Request() req
+    @Request() req,
   ): Promise<Appointment> {
-    return this.appointmentService.update(
-      id,
-      req.user.id,
-      updateAppointmentDto
-    );
+    return this.appointmentService.update(id, req.user.id, updateAppointmentDto)
   }
 
-  @Delete(":id")
+  @Delete(':id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Delete an appointment" })
-  async remove(@Param("id") id: string, @Request() req): Promise<void> {
-    return this.appointmentService.remove(id, req.user.id);
+  @ApiOperation({ summary: 'Delete an appointment' })
+  async remove(@Param('id') id: string, @Request() req): Promise<void> {
+    return this.appointmentService.remove(id, req.user.id)
   }
 
-  @Post("book")
-  @ApiOperation({ summary: "Book an appointment (for visitors)" })
+  @Post('book')
+  @ApiOperation({ summary: 'Book an appointment (for visitors)' })
   @ApiBody({ type: BookAppointmentDto })
   @ApiOkResponse({ type: Appointment })
-  async book(
-    @Body() bookAppointmentDto: BookAppointmentDto
-  ): Promise<Appointment> {
-    return this.appointmentService.bookAppointment(bookAppointmentDto);
+  async book(@Body() bookAppointmentDto: BookAppointmentDto): Promise<Appointment> {
+    return this.appointmentService.bookAppointment(bookAppointmentDto)
   }
 
-  @Patch(":id")
+  @Patch(':id')
   @UseGuards(AuthGuard)
-  @ApiOperation({ summary: "Update an appointment" })
-  @ApiParam({ name: "id", description: "Appointment ID" })
+  @ApiOperation({ summary: 'Update an appointment' })
+  @ApiParam({ name: 'id', description: 'Appointment ID' })
   @ApiBody({ type: UpdateAppointmentDto })
-  async updateAppointment(
-    @Param("id") id: string,
-    @Body() updateAppointmentDto: UpdateAppointmentDto
-  ) {
-    return this.appointmentService.updateAppointment(id, updateAppointmentDto);
+  async updateAppointment(@Param('id') id: string, @Body() updateAppointmentDto: UpdateAppointmentDto) {
+    return this.appointmentService.updateAppointment(id, updateAppointmentDto)
   }
 }

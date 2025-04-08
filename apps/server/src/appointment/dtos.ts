@@ -1,147 +1,147 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsEmail, IsOptional, IsEnum, IsDate } from "class-validator";
-import { Transform } from "class-transformer";
-import { AppointmentStatus } from "./appointment.entity";
+import { ApiProperty } from '@nestjs/swagger'
+import { IsString, IsEmail, IsOptional, IsEnum, IsDate } from 'class-validator'
+import { Transform } from 'class-transformer'
+import { AppointmentStatus } from './appointment.entity'
 
 export class CreateAppointmentDto {
-  @ApiProperty({ description: "Title of the appointment" })
+  @ApiProperty({ description: 'Title of the appointment' })
   @IsString()
-  title: string;
+  title: string
 
   @ApiProperty({
-    description: "Description of the appointment",
+    description: 'Description of the appointment',
     required: false,
   })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string
 
-  @ApiProperty({ description: "Email of the person booking the appointment" })
+  @ApiProperty({ description: 'Email of the person booking the appointment' })
   @IsEmail()
-  inviteeEmail: string;
+  inviteeEmail: string
 
   @ApiProperty({
-    description: "Name of the person booking the appointment",
+    description: 'Name of the person booking the appointment',
     required: false,
   })
   @IsString()
   @IsOptional()
-  inviteeName?: string;
+  inviteeName?: string
 
-  @ApiProperty({ description: "Start date and time of the appointment" })
+  @ApiProperty({ description: 'Start date and time of the appointment' })
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  startDate: Date;
+  startDate: Date
 
-  @ApiProperty({ description: "End date and time of the appointment" })
+  @ApiProperty({ description: 'End date and time of the appointment' })
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  endDate: Date;
+  endDate: Date
 
   @ApiProperty({
-    description: "Status of the appointment",
+    description: 'Status of the appointment',
     enum: AppointmentStatus,
     default: AppointmentStatus.PENDING,
   })
   @IsEnum(AppointmentStatus)
   @IsOptional()
-  status?: AppointmentStatus;
+  status?: AppointmentStatus
 }
 
 export class UpdateAppointmentDto {
-  @ApiProperty({ description: "Title of the appointment", required: false })
+  @ApiProperty({ description: 'Title of the appointment', required: false })
   @IsString()
   @IsOptional()
-  title?: string;
+  title?: string
 
   @ApiProperty({
-    description: "Description of the appointment",
+    description: 'Description of the appointment',
     required: false,
   })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string
 
   @ApiProperty({
-    description: "Email of the person booking the appointment",
+    description: 'Email of the person booking the appointment',
     required: false,
   })
   @IsEmail()
   @IsOptional()
-  inviteeEmail?: string;
+  inviteeEmail?: string
 
   @ApiProperty({
-    description: "Name of the person booking the appointment",
+    description: 'Name of the person booking the appointment',
     required: false,
   })
   @IsString()
   @IsOptional()
-  inviteeName?: string;
+  inviteeName?: string
 
   @ApiProperty({
-    description: "Start date and time of the appointment",
+    description: 'Start date and time of the appointment',
     required: false,
   })
   @IsDate()
   @IsOptional()
   @Transform(({ value }) => (value ? new Date(value) : undefined))
-  startDate?: Date;
+  startDate?: Date
 
   @ApiProperty({
-    description: "End date and time of the appointment",
+    description: 'End date and time of the appointment',
     required: false,
   })
   @IsDate()
   @IsOptional()
   @Transform(({ value }) => (value ? new Date(value) : undefined))
-  endDate?: Date;
+  endDate?: Date
 
   @ApiProperty({
-    description: "Status of the appointment",
+    description: 'Status of the appointment',
     enum: AppointmentStatus,
     required: false,
   })
   @IsEnum(AppointmentStatus)
   @IsOptional()
-  status?: AppointmentStatus;
+  status?: AppointmentStatus
 }
 
 export class BookAppointmentDto {
-  @ApiProperty({ description: "ID of the user who owns the availability" })
+  @ApiProperty({ description: 'ID of the user who owns the availability' })
   @IsString()
-  userId: string;
+  userId: string
 
-  @ApiProperty({ description: "Email of the person booking the appointment" })
+  @ApiProperty({ description: 'Email of the person booking the appointment' })
   @IsEmail()
-  inviteeEmail: string;
+  inviteeEmail: string
 
   @ApiProperty({
-    description: "Name of the person booking the appointment",
+    description: 'Name of the person booking the appointment',
     required: false,
   })
   @IsString()
   @IsOptional()
-  inviteeName?: string;
+  inviteeName?: string
 
-  @ApiProperty({ description: "Title of the appointment" })
+  @ApiProperty({ description: 'Title of the appointment' })
   @IsString()
-  title: string;
+  title: string
 
-  @ApiProperty({ description: "Start date and time of the appointment" })
+  @ApiProperty({ description: 'Start date and time of the appointment' })
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  startDate: Date;
+  startDate: Date
 
-  @ApiProperty({ description: "End date and time of the appointment" })
+  @ApiProperty({ description: 'End date and time of the appointment' })
   @IsDate()
   @Transform(({ value }) => new Date(value))
-  endDate: Date;
+  endDate: Date
 
   @ApiProperty({
-    description: "Description for the appointment",
+    description: 'Description for the appointment',
     required: false,
   })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string
 }

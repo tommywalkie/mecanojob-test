@@ -1,39 +1,39 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
-import { Exclude } from "class-transformer";
+import { ApiProperty } from '@nestjs/swagger'
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Exclude } from 'class-transformer'
 
-@Entity({ name: "user" })
+@Entity({ name: 'user' })
 export class User {
-  @PrimaryGeneratedColumn("uuid")
-  @ApiProperty({ description: "Unique identifier of the user" })
-  id: string;
+  @PrimaryGeneratedColumn('uuid')
+  @ApiProperty({ description: 'Unique identifier of the user' })
+  id: string
 
   @Column({ unique: true })
-  @ApiProperty({ description: "Email of the user" })
-  email: string;
+  @ApiProperty({ description: 'Email of the user' })
+  email: string
 
   @Column()
-  @ApiProperty({ description: "Password of the user" })
+  @ApiProperty({ description: 'Password of the user' })
   @Exclude()
-  password: string;
+  password: string
 
   @Column()
-  @ApiProperty({ description: "First name of the user" })
-  firstName: string;
+  @ApiProperty({ description: 'First name of the user' })
+  firstName: string
 
   @Column()
-  @ApiProperty({ description: "Last name of the user" })
-  lastName: string;
+  @ApiProperty({ description: 'Last name of the user' })
+  lastName: string
 
   @Column({ nullable: true })
   @ApiProperty({
-    description: "Phone number of the user",
+    description: 'Phone number of the user',
     required: false,
     nullable: true,
   })
-  phone: string;
+  phone: string
 
   constructor(partial: Partial<User>) {
-    Object.assign(this, partial);
+    Object.assign(this, partial)
   }
 }

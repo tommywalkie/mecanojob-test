@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/Button";
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/Button'
 
 function BookingConfirmation() {
   return (
@@ -13,27 +13,18 @@ function BookingConfirmation() {
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
         <h1 className="text-2xl font-bold mb-2">Booking Confirmed!</h1>
-        <p className="text-gray-600 mb-6">
-          Your appointment has been successfully scheduled.
-        </p>
+        <p className="text-gray-600 mb-6">Your appointment has been successfully scheduled.</p>
       </div>
 
       <Link to="/">
-        <Button className="bg-indigo-600 text-white hover:bg-indigo-700">
-          Return to Homepage
-        </Button>
+        <Button className="bg-indigo-600 text-white hover:bg-indigo-700">Return to Homepage</Button>
       </Link>
     </div>
-  );
+  )
 }
 
-export default BookingConfirmation;
+export default BookingConfirmation
