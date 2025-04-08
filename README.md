@@ -58,6 +58,8 @@ pnpm test
 
 This command will simultaneously build the client and the server in production mode using environment variables from the `.env.production` file.
 
+Frontend build output will be to the `public` folder of the server.
+
 ```bash
 pnpm build
 ```
