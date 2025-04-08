@@ -8,7 +8,8 @@ import { Button } from '@/components/Button'
 // Define Zod schema for form validation
 const signupSchema = z
   .object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
+    firstName: z.string().min(2, 'First name must be at least 2 characters'),
+    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
     email: z.string().email('Invalid email address'),
     password: z.string().min(3, 'Password must be at least 3 characters'),
     confirmPassword: z.string(),
@@ -37,7 +38,8 @@ function Signup() {
     const { confirmPassword, ...signupData } = data
 
     registerMutation.mutate({
-      name: signupData.name,
+      firstName: signupData.firstName,
+      lastName: signupData.lastName,
       email: signupData.email,
       password: signupData.password,
     })
@@ -69,17 +71,31 @@ function Signup() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="-space-y-px">
             <div className="mb-4">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                First Name
               </label>
               <input
-                id="name"
+                id="firstName"
                 type="text"
-                {...register('name')}
+                {...register('firstName')}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Full Name"
               />
-              {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
+              {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>}
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                Last Name
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                {...register('lastName')}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Last Name"
+              />
+              {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>}
             </div>
 
             <div className="mb-4">

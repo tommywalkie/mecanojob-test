@@ -10,13 +10,23 @@ export const useSignup = () => {
   const navigate = useNavigate()
 
   return useMutation({
-    mutationFn: async ({ name, email, password }: { name: string; email: string; password: string }) => {
+    mutationFn: async ({
+      firstName,
+      lastName,
+      email,
+      password,
+    }: {
+      firstName: string
+      lastName: string
+      email: string
+      password: string
+    }) => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ firstName, lastName, email, password }),
       })
 
       if (!response.ok) {
